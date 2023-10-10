@@ -9,7 +9,7 @@ cluster.setupPrimary({
     exec: 'index.js'
 })
 
-
 for (let i = 0; i < cpuCounter; i++) {
-    cluster.fork(); // creates new Node instance
+    cluster.fork(); // creates new Node instance (копирование процесса, копирование js)
 }
+  
