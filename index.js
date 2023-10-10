@@ -1,7 +1,12 @@
 //loadtest -t 20 -c 100 -k  http://localhost:8181/performance/total?count=50000000
+//loadtest --help - подсказки
 
 import MongoConnection from "./MongoConnection.mjs";
 import express from 'express'
+import workerpool from 'workerpool'
+
+// возвращает объект
+const pool = workerpool.pool('./totalThread.mjs') //link to a file containing thread registration in pool
 
 const port = process.env.PORT || 8181
 const password = 'artem1234' //process.env.MONGO_PASSWORD
@@ -17,13 +22,18 @@ server.on('listening', () => {
 })
 
 app.get('/performance/total', (req, res) => {
-    const startTime = new Date();
+    // const startTime = new Date();
     const count = +req.query.count;
-    let total = 0;
-    for (let i = 0; i < count; i++) {
-        total++;
-    }
-    res.send({ pid: process.pid, api: 'node', total, time: new Date().getTime() - startTime.getTime() })
+    pool.exec("total", [count], {
+        on: payload => {
+            if (payload.event == 'partition') {
+                res.write(payload.data + '\n')
+                console.log(payload.data);
+            } else {
+                res.end(JSON.stringify(payload.data))
+            }
+        }
+    }) // total из totalThread (total: totalThread)
 })
 
 app.get('/performance/students', async (req, res) => {
