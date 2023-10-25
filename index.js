@@ -23,7 +23,11 @@ app.get('/performance/total', (req, res) => {
     for (let i = 0; i < count; i++) {
         total++;
     }
-    res.send({ pid: process.pid, api: 'node', total, time: new Date().getTime() - startTime.getTime() })
+    res.send({
+        pid: process.pid,
+        api: 'node', total,
+        time: new Date().getTime() - startTime.getTime()
+    })
 })
 
 app.get('/performance/students', async (req, res) => {
